@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('dashboard', ['ui.router']);
+angular.module('dashboard', ['ui.router','chart.js']);

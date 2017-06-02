@@ -3,7 +3,8 @@
 
 angular.module('cwdApp',[
     'ui.router',
-    'dashboard'
+    'dashboard',
+    'chart.js'
 ])
 
 
