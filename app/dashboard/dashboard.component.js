@@ -1,83 +1,136 @@
 'use strict';
 
 function MainCtrl($scope) {
-    const ctrl = this;
-    // Initialize a date picker on the specified input element
-    var dp_params = {
-            // There are two modes: dp-modal (the default) and dp-below
-            // dp-modal makes the date picker show up as a modal.
-            // dp-below makes it show up beneath its input element.
-            mode: 'dp-below',
-            // Whether to use Monday as start of the week
-            weekStartsMonday: true
-        };
-    TinyDatePicker(document.querySelector('#date-picking-start'), dp_params);
-    TinyDatePicker(document.querySelector('#date-picking-end'), dp_params);
+   const ctrl = this;
 
-    ctrl.date = {};
-}
 
-function LineCtrl($scope, $timeout) {
+    function createLabel(date, count) {
+        return new Date(date.start.getFullYear(), date.start.getMonth(), date.start.getDate()+count).toLocaleDateString();
+    }
 
-    $scope.labels = ["January", "February", "March", "April", "May", "June", "July"];
-    $scope.series = ['Series A', 'Series B'];//sensor's name
-    $scope.data = [
-        [65, 59, 80, 81, 56, 55, 40],
-        [28, 48, 40, 19, 86, 27, 90]
-    ];
-    $scope.options = {
-        tooltips: {
-            mode: 'index',
-            intersect: false
-        },
-        hover: {
-            mode: 'nearest',
-            intersect: true
-        },
-        scales: {
-            xAxes: [{
-                display: true,
-                scaleLabel: {
-                    display: true,
-                    labelString: 'Month'
-                }
-            }],
-            yAxes: [{
-                display: true,
-                scaleLabel: {
-                    display: true,
-                    labelString: 'Value'
-                }
-            }]
+    function createLabels(date) {
+        var labels = [];
+        var period = date.getPeriod();
+
+        for(var i=0; i <= period; i++) {
+            labels.push(createLabel(date, i));
         }
-    };
 
-    $scope.onClick = function (points, evt) {
-        console.log(points, evt);
-    };
+        return labels;
+    }
 
-    /*   // Simulate async data update
-     $timeout(function () {
-     $scope.data = [
-     [28, 48, 40, 19, 86, 27, 90],
-     [65, 59, 80, 81, 56, 55, 40]
-     ];
-     }, 3000);*/
+    //init
+    function DatePicker() {
+        var oneDay = 24*60*60*1000;
+        var today =  new Date();
+
+        this.start = today;
+        this.end = new Date(today.getFullYear(), today.getMonth(), today.getDate()+6, today.getHours(), today.getMinutes());
+
+        this.getPeriod = function() {
+            return Math.round((this.end - this.start)/(oneDay));
+        }
+
+    }
+
+    $scope.dates = new DatePicker();
+    ctrl.labels = createLabels($scope.dates);
+    ctrl.charType = "line";
+
+
+    // Watchers
+    $scope.$watch('dates', function (newValue, oldValue) {
+        console.log("old:",oldValue);
+        console.log("new:",newValue);
+        var period =  $scope.dates.getPeriod();
+        console.log(period);
+
+    }, true);
+    //watch datePicker
+    /*$scope.$watchCollection(angular.bind(ctrl, function () {
+        return ctrl.datePicker;
+    }), function( ) {
+            period = ctrl.datePicker.getPeriod();
+        console.log("DP has changed");
+        if(period < 1){
+            alert("Выбран некорректный период!");
+            //ctrl.datePicker = new DatePicker(); //todo: Error Re Do
+        } else {
+            ctrl.labels.push(createLabel(ctrl.datePicker, period+1));
+        }
+    });*/
 }
-
 
 function chartDir() {
     return {
-        restrict: 'EA',
-        replace: true,
-        scope: false,
-        controllerAs: 'chart',
-        link: function ($scope, $element, $attrs) {//манипуляция с DOM
+        restrict: 'E',
+        scope: {
+            cdDate: '=',
+            cdLabels: '=',
+            cdType: '@'
+        },
+        link: function (scope, $element, $attrs) {//манипуляция с DOM
 
+            function createData(count) {
+                var randomScalingFactor = function() {
+                    return Math.round(Math.random() * 100);
+                };
+
+                if (count == 1) return randomScalingFactor();//todo:improve
+
+                var data=[];
+                for(var i=0; i < count; i++) {
+                    data.push(randomScalingFactor());
+                }
+
+                return data;
+            }
+
+
+            scope.labels = scope.cdLabels;
+            scope.type = scope.cdType;
+            scope.series = ['Series A'];//sensor names
+            scope.data = [createData(scope.cdLabels.length)]; //ToDo: заменить на цикл по series
+
+            scope.options = {
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'День'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Значение сенсора'
+                        }
+                    }]
+                }
+            };
+
+
+
+
+
+            scope.onClick = function (points, evt) {
+                console.log(points, evt);
+            };
+
+            //watch datePicker
+            /*$scope.$watchCollection(angular.bind($scope, function () {
+             return $scope.cdLabels;
+             }), function( ) {
+             $scope.labels = $scope.cdLabels;
+             $scope.data.push(createData(1)); //= createData($scope.cdLabels.length);
+             console.log("chart labels has changed!");
+             });*/
         },
         templateUrl: "dashboard/chart-dir.template.html",
-        controller: 'LineCtrl'
-    };
+        transclude: true
+    }
 }
 
 angular.module('dashboard')
@@ -95,7 +148,6 @@ angular.module('dashboard')
     }])
 
     .controller("MainCtrl", ['$scope', MainCtrl])
-    .controller("LineCtrl", ['$scope', '$timeout', LineCtrl])
 
     .directive('chartDir', chartDir)
 

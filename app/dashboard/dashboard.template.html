@@ -1,19 +1,28 @@
-<pre>
-    {{$ctrl.date | json}}
-</pre>
-
-<div >
-    <label>Pick a date:
-    <input  type="text" id="date-picking-start" class="form-control" ng-model="$ctrl.date.start">
-    </label>
-</div>
-<div >
-    <label>And another:
-        <input  type="text" id="date-picking-end" class="form-control"  ng-model="$ctrl.date.end">
-    </label>
+<!--Debug-->
+<div class="row">
+    <pre class="col-md-4">{{dates | json}}</pre>
+    <pre class="col-md-2">{{$ctrl.labels | json}}</pre>
 </div>
 
+
+<div class="row">
+    <div class="col-md-2">
+        <label>Дата начала:</label>
+        <input type="date" class="form-control" ng-model="dates.start">
+    </div>
+    <div class="col-md-2">
+        <label>Дата конца:</label>
+        <input type="date" class="form-control" ng-model="dates.end">
+    </div>
+</div>
+
+
+<hr>
+
+<data-chart-dir cd-labels="$ctrl.labels" cd-type="{{$ctrl.charType}}"></data-chart-dir>
+
+<!--
 <chart-dir></chart-dir>
 <chart-dir></chart-dir>
 <chart-dir></chart-dir>
-<chart-dir></chart-dir>
+-->
