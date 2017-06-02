@@ -1,5 +1,22 @@
 'use strict';
 
+function MainCtrl($scope) {
+    const ctrl = this;
+    // Initialize a date picker on the specified input element
+    var dp_params = {
+            // There are two modes: dp-modal (the default) and dp-below
+            // dp-modal makes the date picker show up as a modal.
+            // dp-below makes it show up beneath its input element.
+            mode: 'dp-below',
+            // Whether to use Monday as start of the week
+            weekStartsMonday: true
+        };
+    TinyDatePicker(document.querySelector('#date-picking-start'), dp_params);
+    TinyDatePicker(document.querySelector('#date-picking-end'), dp_params);
+
+    ctrl.date = {};
+}
+
 function LineCtrl($scope, $timeout) {
 
     $scope.labels = ["January", "February", "March", "April", "May", "June", "July"];
@@ -77,12 +94,12 @@ angular.module('dashboard')
         });
     }])
 
+    .controller("MainCtrl", ['$scope', MainCtrl])
     .controller("LineCtrl", ['$scope', '$timeout', LineCtrl])
 
+    .directive('chartDir', chartDir)
 
     .component('dashboard', {
         templateUrl: "dashboard/dashboard.template.html",
-        controller: 'LineCtrl'
-    })
-
-    .directive('chartDir', chartDir);
+        controller: 'MainCtrl'
+    });

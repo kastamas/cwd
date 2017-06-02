@@ -1,7 +1,19 @@
-<div>
-    <p>It's got to be working, And yes, it is!</p>
-    <chart-dir></chart-dir>
-    <chart-dir></chart-dir>
-    <chart-dir></chart-dir>
-    <chart-dir></chart-dir>
+<pre>
+    {{$ctrl.date | json}}
+</pre>
+
+<div >
+    <label>Pick a date:
+    <input  type="text" id="date-picking-start" class="form-control" ng-model="$ctrl.date.start">
+    </label>
 </div>
+<div >
+    <label>And another:
+        <input  type="text" id="date-picking-end" class="form-control"  ng-model="$ctrl.date.end">
+    </label>
+</div>
+
+<chart-dir></chart-dir>
+<chart-dir></chart-dir>
+<chart-dir></chart-dir>
+<chart-dir></chart-dir>
