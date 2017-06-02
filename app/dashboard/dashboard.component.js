@@ -1,45 +1,74 @@
 'use strict';
-/*
-function  LineCtrl () {
+
+function LineCtrl($scope, $timeout) {
+
     $scope.labels = ["January", "February", "March", "April", "May", "June", "July"];
-    $scope.series = ['Series A', 'Series B'];
+    $scope.series = ['Series A', 'Series B'];//sensor's name
     $scope.data = [
         [65, 59, 80, 81, 56, 55, 40],
         [28, 48, 40, 19, 86, 27, 90]
     ];
+    $scope.options = {
+        tooltips: {
+            mode: 'index',
+            intersect: false
+        },
+        hover: {
+            mode: 'nearest',
+            intersect: true
+        },
+        scales: {
+            xAxes: [{
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Month'
+                }
+            }],
+            yAxes: [{
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Value'
+                }
+            }]
+        }
+    };
+
     $scope.onClick = function (points, evt) {
         console.log(points, evt);
     };
-    $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];
-    $scope.options = {
-        scales: {
-            yAxes: [
-                {
-                    id: 'y-axis-1',
-                    type: 'linear',
-                    display: true,
-                    position: 'left'
-                },
-                {
-                    id: 'y-axis-2',
-                    type: 'linear',
-                    display: true,
-                    position: 'right'
-                }
-            ]
-        }
+
+    /*   // Simulate async data update
+     $timeout(function () {
+     $scope.data = [
+     [28, 48, 40, 19, 86, 27, 90],
+     [65, 59, 80, 81, 56, 55, 40]
+     ];
+     }, 3000);*/
+}
+
+
+function chartDir() {
+    return {
+        restrict: 'EA',
+        replace: true,
+        scope: false,
+        controllerAs: 'chart',
+        link: function ($scope, $element, $attrs) {//манипуляция с DOM
+
+        },
+        templateUrl: "dashboard/chart-dir.template.html",
+        controller: 'LineCtrl'
     };
-}*/
+}
 
 angular.module('dashboard')
-    //.controller('LineCtrl', LineCtrl)
 
-
-// Optional configuration
+    // Optional configuration for All Charts
     .config(['ChartJsProvider', function (ChartJsProvider) {
         // Configure all charts
         ChartJsProvider.setOptions({
-            chartColors: ['#FF5252', '#FF8A80'],
             responsive: false
         });
         // Configure all line charts
@@ -47,62 +76,13 @@ angular.module('dashboard')
             showLines: true
         });
     }])
-    .controller("LineCtrl", ['$scope', '$timeout', function ($scope, $timeout) {
 
-        $scope.labels = ["January", "February", "March", "April", "May", "June", "July"];
-        $scope.series = ['Series A', 'Series B'];
-        $scope.data = [
-            [65, 59, 80, 81, 56, 55, 40],
-            [28, 48, 40, 19, 86, 27, 90]
-        ];
-        $scope.options = {
-            title:{
-                display:true,
-                text:'Chart.js Line Chart'
-            },
-            tooltips: {
-                mode: 'index',
-                intersect: false
-            },
-            hover: {
-                mode: 'nearest',
-                intersect: true
-            },
-            scales: {
-                xAxes: [{
-                    display: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Month'
-                    }
-                }],
-                yAxes: [{
-                    display: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Value'
-                    }
-                }]
-            }
-        };
-
-        $scope.onClick = function (points, evt) {
-            console.log(points, evt);
-        };
-
-     /*   // Simulate async data update
-        $timeout(function () {
-            $scope.data = [
-                [28, 48, 40, 19, 86, 27, 90],
-                [65, 59, 80, 81, 56, 55, 40]
-            ];
-        }, 3000);*/
-    }])
+    .controller("LineCtrl", ['$scope', '$timeout', LineCtrl])
 
 
-.component('dashboard', {
- templateUrl: "dashboard/dashboard.template.html",
- controller: 'LineCtrl'
+    .component('dashboard', {
+        templateUrl: "dashboard/dashboard.template.html",
+        controller: 'LineCtrl'
+    })
 
-
- });
+    .directive('chartDir', chartDir);
