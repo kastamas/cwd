@@ -19,7 +19,6 @@
     "angular-cookies": "1.5.8",
     "angular-animate": "1.5.8",
     "angular-ui-router": "1.0.3",
-    "angular-chart.js": "^1.1.1",
-    "tiny-date-picker": "^2.0.12"
+    "angular-chart.js": "^1.1.1"
   }
 }
