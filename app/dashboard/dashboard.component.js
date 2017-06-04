@@ -3,9 +3,47 @@
 function MainCtrl($scope) {
    const ctrl = this;
 
+    function watchDates(newValue, oldValue) {
+        //обработка исключительной ситуации
+        if(newValue.start === null || newValue.end === null)//todo: improve
+            return;
 
-    function createLabel(date, count) {
-        return new Date(date.start.getFullYear(), date.start.getMonth(), date.start.getDate()+count).toLocaleDateString();
+        console.log("old:",oldValue);
+        console.log("new:",newValue);
+
+        var oldPeriod = oldValue.getPeriod();
+        var newPeriod =  newValue.getPeriod();
+        var difference = newPeriod - oldPeriod;
+        var i;
+
+        if(difference > 0){// если разница больше, период увеличился
+            console.log("diff", difference);
+            if(oldValue.start > newValue.start){
+                //старт сдвинулся  влево
+                for(i = 1; i <= difference; i++)
+                    ctrl.labels.unshift(createLabel(oldValue, -i));
+            } else {
+                //конец cдвинулся  вправо
+                for(i = 1; i <= difference; i++)
+                    ctrl.labels.push(createLabel(newValue, oldPeriod + i));
+            }
+        } else {
+            console.log("diff", difference);
+            if(oldValue.start < newValue.start){
+                //старт сдвинулся  вправо
+                for(; difference < 0; difference++)
+                    ctrl.labels.shift();
+            } else {
+                //конец cдвинулся  влево
+                for(; difference < 0; difference++)
+                    ctrl.labels.pop();
+            }
+        }
+
+    }
+
+    function createLabel(date, days) {
+        return new Date(date.start.getFullYear(), date.start.getMonth(), date.start.getDate()+days).toLocaleDateString();
     }
 
     function createLabels(date) {
@@ -19,7 +57,6 @@ function MainCtrl($scope) {
         return labels;
     }
 
-    //init
     function DatePicker() {
         var oneDay = 24*60*60*1000;
         var today =  new Date();
@@ -33,32 +70,14 @@ function MainCtrl($scope) {
 
     }
 
+    // init
     $scope.dates = new DatePicker();
     ctrl.labels = createLabels($scope.dates);
     ctrl.charType = "line";
 
 
     // Watchers
-    $scope.$watch('dates', function (newValue, oldValue) {
-        console.log("old:",oldValue);
-        console.log("new:",newValue);
-        var period =  $scope.dates.getPeriod();
-        console.log(period);
-
-    }, true);
-    //watch datePicker
-    /*$scope.$watchCollection(angular.bind(ctrl, function () {
-        return ctrl.datePicker;
-    }), function( ) {
-            period = ctrl.datePicker.getPeriod();
-        console.log("DP has changed");
-        if(period < 1){
-            alert("Выбран некорректный период!");
-            //ctrl.datePicker = new DatePicker(); //todo: Error Re Do
-        } else {
-            ctrl.labels.push(createLabel(ctrl.datePicker, period+1));
-        }
-    });*/
+    $scope.$watch('dates', watchDates, true);
 }
 
 function chartDir() {
