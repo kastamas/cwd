@@ -5,19 +5,24 @@ function MainCtrl($scope) {
 
     function watchDates(newValue, oldValue) {
         //обработка исключительной ситуации
-        if(newValue.start === null || newValue.end === null)//todo: improve
-            return;
+        if(newValue.start === null || newValue.end === null){
+            throw new Error('Нужно выбрать даты, чтобы начать построение графиков!');
+        }//todo: improve errors displaying
 
-        console.log("old:",oldValue);
-        console.log("new:",newValue);
+        if(oldValue.start === null || oldValue.end === null){
+            ctrl.labels = createLabels(newValue);
+            return;
+        }
 
         var oldPeriod = oldValue.getPeriod();
         var newPeriod =  newValue.getPeriod();
         var difference = newPeriod - oldPeriod;
         var i;
 
+        if(newPeriod < 1) // Todo: B<A situation
+            throw new Error('Для рассчётов, нужно чтобы был выбран период хотя бы из 2-х дней!');
+
         if(difference > 0){// если разница больше, период увеличился
-            console.log("diff", difference);
             if(oldValue.start > newValue.start){
                 //старт сдвинулся  влево
                 for(i = 1; i <= difference; i++)
@@ -28,7 +33,6 @@ function MainCtrl($scope) {
                     ctrl.labels.push(createLabel(newValue, oldPeriod + i));
             }
         } else {
-            console.log("diff", difference);
             if(oldValue.start < newValue.start){
                 //старт сдвинулся  вправо
                 for(; difference < 0; difference++)
@@ -58,14 +62,15 @@ function MainCtrl($scope) {
     }
 
     function DatePicker() {
-        var oneDay = 24*60*60*1000;
-        var today =  new Date();
+        var oneDay = 24 * 60 * 60 * 1000;
+        var today = new Date();
+
 
         this.start = today;
-        this.end = new Date(today.getFullYear(), today.getMonth(), today.getDate()+6, today.getHours(), today.getMinutes());
+        this.end = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 6, today.getHours(), today.getMinutes());
 
-        this.getPeriod = function() {
-            return Math.round((this.end - this.start)/(oneDay));
+        this.getPeriod = function () {
+            return Math.round((this.end - this.start) / (oneDay));
         }
 
     }
@@ -73,20 +78,16 @@ function MainCtrl($scope) {
     // init
     $scope.dates = new DatePicker();
     ctrl.labels = createLabels($scope.dates);
-    ctrl.charType = "line";
-
 
     // Watchers
     $scope.$watch('dates', watchDates, true);
 }
 
-function chartDir() {
+function    chartDir() {
     return {
         restrict: 'E',
         scope: {
-            cdDate: '=',
-            cdLabels: '=',
-            cdType: '@'
+            cdLabels: '='
         },
         link: function (scope, $element, $attrs) {//манипуляция с DOM
 
@@ -105,13 +106,15 @@ function chartDir() {
                 return data;
             }
 
+            // chart init
+            scope.labels = scope.cdLabels;// binding works fine
+            scope.type = "line";
+            scope.series = ['Series A'];//sensors names
 
-            scope.labels = scope.cdLabels;
-            scope.type = scope.cdType;
-            scope.series = ['Series A'];//sensor names
             scope.data = [createData(scope.cdLabels.length)]; //ToDo: заменить на цикл по series
 
             scope.options = {
+                responsive: true,
                 scales: {
                     xAxes: [{
                         display: true,
@@ -131,21 +134,18 @@ function chartDir() {
             };
 
 
-
-
-
             scope.onClick = function (points, evt) {
                 console.log(points, evt);
             };
 
-            //watch datePicker
-            /*$scope.$watchCollection(angular.bind($scope, function () {
-             return $scope.cdLabels;
-             }), function( ) {
-             $scope.labels = $scope.cdLabels;
-             $scope.data.push(createData(1)); //= createData($scope.cdLabels.length);
-             console.log("chart labels has changed!");
-             });*/
+
+
+            // Watchers
+            scope.$watchCollection('cdLabels', function(newValue, oldValue) {
+                scope.labels = scope.cdLabels;// binding works fine
+                scope.data = [createData(scope.cdLabels.length)];
+            });
+
         },
         templateUrl: "dashboard/chart-dir.template.html",
         transclude: true

@@ -1,2 +1,20 @@
-<h5>Chart #1</h5>
-<canvas chart-base="" chart-type="type" chart-data="data" chart-labels="labels" chart-series="series" chart-click="onClick" chart-options="options" width="600" height="300"></canvas>
+<!--Interface-->
+<div class="row">
+    <div class="col-md-2">
+        <h5>Chart #1</h5>
+    </div>
+    <div class="col-md-2"></div>
+    <div class="col-md-2">
+        <select id="chart-type" data-ng-model="type" class="form-control">
+            <option value="line">Линия</option>
+            <option value="bar">Гистограмма</option>
+        </select>
+    </div>
+</div>
+
+<!--Chart-->
+<div class="row">
+    <div class="col-lg-6">
+        <canvas chart-base="" chart-type="type" chart-data="data" chart-labels="labels" chart-series="series" chart-click="onClick" chart-options="options" ></canvas>
+    </div>
+</div>

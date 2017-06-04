@@ -1,9 +1,11 @@
 <!--Debug-->
-<div class="row">
+<!--<div class="row">
     <pre class="col-md-4">{{dates | json}}</pre>
-    <pre class="col-md-2">{{$ctrl.labels | json}}</pre>
-</div>
+   <pre class="col-md-2">{{$ctrl.labels | json}}</pre>
+</div>-->
 
+<!--Data Picker-->
+<hr>
 
 <div class="row">
     <div class="col-md-2">
@@ -14,13 +16,18 @@
         <label>Дата конца:</label>
         <input type="date" class="form-control" ng-model="dates.end">
     </div>
+
 </div>
 
-
 <hr>
-
-<data-chart-dir cd-labels="$ctrl.labels" cd-type="{{$ctrl.charType}}"></data-chart-dir>
-
+<!--Charts-->
+<div class="container">
+    <div class="row">
+        <div class="">
+            <data-chart-dir cd-labels="$ctrl.labels"></data-chart-dir>
+        </div>
+    </div>
+</div>
 <!--
 <chart-dir></chart-dir>
 <chart-dir></chart-dir>
