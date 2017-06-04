@@ -6,7 +6,7 @@ label {
 .footer {
     padding-top: 40px;
     padding-bottom: 40px;
-    margin-top: 40px;
+    margin-top: 30px;
     border-top: 1px solid #eee;
 }
 
@@ -30,4 +30,18 @@ label {
     background-color: #2793db;
     color: white;
     cursor: default;
+}
+
+.vertical-align {
+    vertical-align: baseline;
+}
+
+.text-muted-more {
+    color: #9f9f9f;
+}
+
+.nav-link-button {
+    top: 30px;
+    position: relative;
+    cursor: pointer;
 }

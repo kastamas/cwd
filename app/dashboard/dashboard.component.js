@@ -76,8 +76,23 @@ function MainCtrl($scope) {
     }
 
     // init
+    $scope.charsQuantity = [1];
     $scope.dates = new DatePicker();
     ctrl.labels = createLabels($scope.dates);
+
+    $scope.addChart = function () {
+        if($scope.charsQuantity.length < 4){
+            $scope.charsQuantity.push(($scope.charsQuantity.length)+1);
+        }
+        else throw new Error("Достигнуто максимальное количество графиков");
+    };
+
+    $scope.removeChart = function () {
+        if($scope.charsQuantity.length > 1){
+            $scope.charsQuantity.pop();
+        }
+        else throw new Error("Нельзя убрать единственный график!");
+    };
 
     // Watchers
     $scope.$watch('dates', watchDates, true);
@@ -87,9 +102,34 @@ function    chartDir() {
     return {
         restrict: 'E',
         scope: {
-            cdLabels: '='
+            cdLabels: '=',
+            cdOrder: '@'
         },
         link: function (scope, $element, $attrs) {//манипуляция с DOM
+
+
+            function watchLabels(newValue, oldValue) {
+                var difference = (newValue.length - oldValue.length);
+                console.log("new",newValue.length);
+                console.log("old",oldValue.length);
+                console.log("difference", difference);
+
+                if(difference > 0) {// период увеличился
+                    if(newValue[0] == oldValue[0])// Первый элемент не тронут
+                        scope.data[0] = scope.data[0].concat(createData(difference));
+                    else
+                        scope.data[0] = createData(difference).concat(scope.data[0]); //todo: fix up
+                } else { // уменьшился, diff - отрицательная или 0
+                    if(newValue[0] == oldValue[0])// Первый элемент не тронут
+                        for(; difference < 0; difference++)
+                            scope.data[0].pop();
+                    else
+                        for(; difference < 0; difference++)
+                            scope.data[0].shift();
+                }
+                scope.labels = scope.cdLabels;// binding works fine
+                //scope.data = [createData(scope.cdLabels.length)];
+            }
 
             function createData(count) {
                 var randomScalingFactor = function() {
@@ -106,6 +146,8 @@ function    chartDir() {
                 return data;
             }
 
+
+
             // chart init
             scope.labels = scope.cdLabels;// binding works fine
             scope.type = "line";
@@ -114,7 +156,6 @@ function    chartDir() {
             scope.data = [createData(scope.cdLabels.length)]; //ToDo: заменить на цикл по series
 
             scope.options = {
-                responsive: true,
                 scales: {
                     xAxes: [{
                         display: true,
@@ -138,17 +179,16 @@ function    chartDir() {
                 console.log(points, evt);
             };
 
+            scope.recalculate = function () {
+                scope.data = [createData(scope.data[0].length)];
+            };
 
 
             // Watchers
-            scope.$watchCollection('cdLabels', function(newValue, oldValue) {
-                scope.labels = scope.cdLabels;// binding works fine
-                scope.data = [createData(scope.cdLabels.length)];
-            });
+            scope.$watchCollection('cdLabels', watchLabels);
 
         },
-        templateUrl: "dashboard/chart-dir.template.html",
-        transclude: true
+        templateUrl: "dashboard/chart-dir.template.html"
     }
 }
 
@@ -158,7 +198,7 @@ angular.module('dashboard')
     .config(['ChartJsProvider', function (ChartJsProvider) {
         // Configure all charts
         ChartJsProvider.setOptions({
-            responsive: false
+            responsive: true
         });
         // Configure all line charts
         ChartJsProvider.setOptions('line', {
