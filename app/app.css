@@ -45,3 +45,8 @@ label {
     position: relative;
     cursor: pointer;
 }
+
+hr.thin {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}

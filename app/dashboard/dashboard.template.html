@@ -1,12 +1,14 @@
-<!--Debug-->
+<!--Debug zone-->
 <div class="row">
-  <!--  <pre class="col-md-4">{{dates | json}}</pre>
-   <pre class="col-md-2">{{$ctrl.labels | json}}</pre>-->
-  <pre class="col-md-2">{{charsQuantity}}</pre>
+
+   <pre class="col-md-2">{{charsQuantity}}</pre>
+    <pre class="col-md-3">{{sensorsList | json}}</pre>
+    <pre class="col-md-3">{{sensors | json}}</pre>
+    <pre class="col-md-2">{{sensors[0][1] | json}}</pre>
 </div>
 
-
 <hr>
+
 <!--Dashboard-->
 <div class="row">
     <!--Data Picker-->
@@ -27,32 +29,22 @@
     <div class="col-md-2">
         <a class="nav-link-button" ng-click="removeChart()">убрать график</a>
     </div>
+    <div class="col-md-2">
+        <a class="nav-link-button" ng-click="addSensor()">добавить сенсор</a>
+    </div>
+    <div class="col-md-2">
+        <a class="nav-link-button" ng-click="removeSensor()">убрать сенсор</a>
+    </div>
 </div>
 
 <hr>
+
 <!--Charts-->
 <div class="container">
     <div class="row">
-
         <div class="col-lg-6" ng-repeat="item in charsQuantity">
-            <data-chart-dir cd-order="{{item}}" cd-labels="$ctrl.labels"></data-chart-dir>
+            <data-chart-dir cd-order="{{item}}" cd-labels="$ctrl.labels" cd-sensors="sensors"></data-chart-dir>
         </div>
-       <!-- <div class="col-lg-6 text-center">
-            <span class="glyphicon glyphicon-plus text-muted" style="font-size:24px;" aria-hidden="true"></span>
-        </div>-->
-        <!--<div class="col-lg-6">
-            <data-chart-dir cd-order="2"  cd-labels="$ctrl.labels"></data-chart-dir>
-        </div>
-        <div class="col-lg-6">
-            <data-chart-dir cd-order="3"  cd-labels="$ctrl.labels"></data-chart-dir>
-        </div>
-        <div class="col-lg-6">
-            <data-chart-dir cd-order="4"  cd-labels="$ctrl.labels"></data-chart-dir>
-        </div>-->
     </div>
 </div>
-<!--
-<chart-dir></chart-dir>
-<chart-dir></chart-dir>
-<chart-dir></chart-dir>
--->
+

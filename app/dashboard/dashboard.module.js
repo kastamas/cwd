@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('dashboard', ['ui.router','chart.js']);
+angular.module('dashboard', ['ui.router','chart.js','angularjs-dropdown-multiselect']);

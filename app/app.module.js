@@ -4,6 +4,7 @@
 angular.module('cwdApp',[
     'ui.router',
     'chart.js',
+    'angularjs-dropdown-multiselect',
 
     'dashboard'
 ])
