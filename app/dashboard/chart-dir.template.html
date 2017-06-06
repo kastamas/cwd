@@ -2,6 +2,7 @@
 
 <!--Interface-->
 <div class="row">
+    <a style="position: absolute; cursor:pointer; margin: 8px -10px;" ng-click="cdRemove(cdOrder-1)" style="top:8px" title="убрать график">[x]</a>
     <div class="col-xs-2 col-md-2" style="width: 15%; padding-right:0px;">
         <h4 class="text-muted-more">Chart #{{cdOrder}}</h4>
     </div>
@@ -10,7 +11,7 @@
     </div>-->
 
   <!--  <div class="col-md-1 "><span >тип:</span></div>-->
-    <data-sensors-dir  class="col-xs-4 col-md-4 col-md-offset-2" sensors-all="cdSensors" sensors-index="{{cdOrder}}">
+    <data-sensors-dir  class="col-xs-4 col-md-4 col-md-offset-2" sensors-all="cdSensors" sensors-origin="{{cdOrder}}">
 
     </data-sensors-dir>
     <div  class="col-xs-4 col-md-4"> <!--todo: i dunno why, but ng-if="status" collapses all-->
@@ -24,7 +25,7 @@
 <hr class="thin">
 
 <!--Chart-->
-<div class="row" ng-if="status">
+<div class="row">
     <div class="col-lg-12">
         <canvas chart-base="" chart-type="type" chart-data="data" chart-labels="labels" chart-series="series" chart-click="onClick" chart-options="options" chart-dataset-override="dataset"></canvas>
     </div>

@@ -78,22 +78,51 @@ function MainCtrl($scope) {
 
 
     // init
-    $scope.charsQuantity = [1];
+    $scope.chars = [1]; /// array with chars id's
     $scope.dates = new DatePicker();
     ctrl.labels = createLabels($scope.dates);
 
-    $scope.sensors = [[],[],[],[]];
+    $scope.sensors = [ [] ];//todo:improve
 
     $scope.addChart = function () {
-        if($scope.charsQuantity.length < 4){
-            $scope.charsQuantity.push(($scope.charsQuantity.length)+1);
+        var length = $scope.chars.length;
+        if(length < 4){
+            $scope.chars.push(($scope.chars[length-1] + 1));
+            $scope.sensors.push([]);
         }
         else throw new Error("Достигнуто максимальное количество графиков");
     };
 
-    $scope.removeChart = function () {
-        if($scope.charsQuantity.length > 1){
-            $scope.charsQuantity.pop();
+    $scope.removeChart = function (index) {
+        var length = $scope.chars.length;
+        var first = 0;
+
+        if (length > 1)
+        switch (index){
+            case length - 1: {
+                $scope.chars = $scope.chars.slice(0,index);
+                $scope.sensors.pop();
+                break;
+            }
+            case first: {
+                $scope.chars = $scope.chars.slice(1);
+                $scope.sensors.shift();
+                break;
+            }
+            default: {
+                var begin = $scope.chars.slice(0,index);
+                var end = $scope.chars.slice(index+1);
+                $scope.chars = begin.concat(end);
+                $scope.sensors.splice(index, 1);
+            }
+        }
+        else  throw new Error("Должен остаться хотя-бы один график!");
+
+        console.log("Length: " + length + " index: " + index);
+
+        if(length > 1) {//если есть хотя бы один элемент(график)
+
+            //$scope.charsQuantity = [$scope.charsQuantity.slice(0,index)].push($scope.charsQuantity.slice(index+1));//создаю новый массив = старому - index;
         }
         else throw new Error("Нельзя убрать единственный график!");
     };
@@ -111,7 +140,9 @@ function    chartDir() {
         scope: {
             cdLabels: '=',
             cdSensors: '=',
-            cdOrder: '@'
+            cdOrder: '@',
+            cdRemove: '=',
+            cdId: '@'
         },
         replace: false,
         link: function (scope, $element, $attrs) {//манипуляция с DOM ToDO: засунуть биндинги в контроллёр
@@ -122,7 +153,7 @@ function    chartDir() {
                 var parts = scope.cdSensors[scope.cdOrder-1].length;
 
                 /*if(difference > 0) {// период увеличился todo:improve!
-                    if(newValue[0] == oldValue[0])// Первый элемент не тронут
+   Order}                 if(newValue[0] == oldValue[0])// Первый элемент не тронут
                         scope.data[0] = scope.data[0].concat(createData(difference, parts));
                     else
                         scope.data[0] = createData(difference, parts).concat(scope.data[0]); //todo: fix up
@@ -144,14 +175,18 @@ function    chartDir() {
                 var dataset = [];
                 var options = {fill:false};
 
+
+
+
                 scope.cdSensors[scope.cdOrder - 1].forEach(function (item, i) {
                     sensors.push(item.nameRus);
                     dataset.push(options);
                 });
 
                 scope.series = sensors;
-                scope.dataset = dataset;
-                console.log("Series", sensors);
+
+                dataset.length == 0 ? scope.dataset = [] :  scope.dataset = dataset; //todo: isn't works like i want it, fix it
+
                 scope.recalculate();
 
                 scope.status = scope.cdSensors[scope.cdOrder-1].length;
@@ -218,7 +253,6 @@ function    chartDir() {
             // actions
             scope.recalculate = function () {
                 scope.data = createData(scope.cdLabels.length, scope.cdSensors[scope.cdOrder-1].length);//todo: not obvious that scope.status is sensorsQuantity
-                console.log("Data!",scope.data);
             };
 
 
@@ -236,7 +270,7 @@ function  sensorsDir() {
         restrict: 'E',
         scope: {
             sensorsAll: '=',
-            sensorsIndex: '@'
+            sensorsOrigin: '@'
         },
         controller:['$scope' ,function ($scope) {
 
@@ -254,14 +288,29 @@ function  sensorsDir() {
                 {
                     "id": 43,
                     "name": "temperature_3",
-                    "nameRus": "температура 3"
+                    "nameRus": "свет 1"
+                },
+                {
+                    "id": 44,
+                    "name": "temperature_3",
+                    "nameRus": "свет 2"
+                },
+                {
+                    "id": 45,
+                    "name": "temperature_3",
+                    "nameRus": "влажность 1"
+                },
+                {
+                    "id": 47,
+                    "name": "temperature_3",
+                    "nameRus": "влажность 2"
                 }];
 
 
 
             // sensors
             var reachedSensorsMax = function (item) {
-                throw new Error("Достигнуто максимальное количество сенсоров");
+                throw new Error("Достигнуто максимальное количество сенсоров");// todo: improve handling
             };
 
             var selectSensor = function (option) {
@@ -272,7 +321,7 @@ function  sensorsDir() {
             };
 
 
-            $scope.sensorsDropdownModel = $scope.sensorsAll[$scope.sensorsIndex-1];
+            $scope.sensorsDropdownModel = $scope.sensorsAll[$scope.sensorsOrigin-1];
             $scope.sensorsDropdownData = sensorsList;
             $scope.sensorsDropdownSettings = {
                 /*showEnableSearchButton: true,*/
@@ -281,13 +330,14 @@ function  sensorsDir() {
                 searchField: 'nameRus',
                 enableSearch: true,
                 selectionLimit: 4,
-                selectedToTop: true
+                selectedToTop: true,
+                showCheckAll: false
             };
             $scope.sensorsDropdownTranslation = {
                 buttonDefaultText: 'Выбрать Сенсоры',
                 uncheckAll: 'Убрать все',
                 selectionCount: 'Выбрано',
-                dynamicButtonTextSuffix: 'Выбран'
+                dynamicButtonTextSuffix: 'Выбрано'
             };
             $scope.sensorsDropdownEvents = {
                 onMaxSelectionReached: reachedSensorsMax,
