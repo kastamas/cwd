@@ -1,11 +1,10 @@
 <!--Debug zone-->
-<div class="row">
-
+<!--<div class="row">
    <pre class="col-md-2">{{charsQuantity}}</pre>
     <pre class="col-md-3">{{sensorsList | json}}</pre>
     <pre class="col-md-3">{{sensors | json}}</pre>
     <pre class="col-md-2">{{sensors[0][1] | json}}</pre>
-</div>
+</div>-->
 
 <hr>
 
@@ -20,7 +19,9 @@
         <label>Дата конца:</label>
         <input type="date" class="form-control" ng-model="dates.end">
     </div>
+    <!--<data-sensors-dir  test-sensors="sensors" class="col-xs-4 col-md-4">
 
+    </data-sensors-dir>-->
     <!--Controls-->
 
     <div class="col-md-2">
@@ -29,19 +30,19 @@
     <div class="col-md-2">
         <a class="nav-link-button" ng-click="removeChart()">убрать график</a>
     </div>
-    <div class="col-md-2">
+ <!--   <div class="col-md-2">
         <a class="nav-link-button" ng-click="addSensor()">добавить сенсор</a>
     </div>
     <div class="col-md-2">
         <a class="nav-link-button" ng-click="removeSensor()">убрать сенсор</a>
-    </div>
+    </div>-->
 </div>
 
 <hr>
 
 <!--Charts-->
 <div class="container">
-    <div class="row">
+    <div class="row ">
         <div class="col-lg-6" ng-repeat="item in charsQuantity">
             <data-chart-dir cd-order="{{item}}" cd-labels="$ctrl.labels" cd-sensors="sensors"></data-chart-dir>
         </div>

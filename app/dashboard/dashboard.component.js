@@ -75,56 +75,14 @@ function MainCtrl($scope) {
 
     }
 
+
+
     // init
     $scope.charsQuantity = [1];
     $scope.dates = new DatePicker();
     ctrl.labels = createLabels($scope.dates);
 
-
-    // sensors init
-    $scope.sensorsList = [
-        {
-            "id": 1,
-            "name": "temperature_1",
-            "nameRus": "температура 1"
-        },
-        {
-            "id": 2,
-            "name": "temperature_2",
-            "nameRus": "температура 2"
-        },
-        {
-            "id": 3,
-            "name": "temperature_3",
-            "nameRus": "температура 3"
-        }];
-
-    $scope.sensors = [[{
-        "id": 1,
-        "name": "temperature_1",
-        "nameRus": "температура 1"
-    }],[],[],[]];
-
-    // sensors
-    $scope.sensorsDropdownModel = [];
-    $scope.sensorsDropdownData = $scope.sensorsList;
-    $scope.sensorsDropdownSettings = {
-        showEnableSearchButton: true,
-        idProp: 'id',
-        displayProp: 'nameRus',
-        searchField: 'nameRus',
-        enableSearch: true,
-        selectionLimit: 4,
-        selectedToTop: true
-    };
-    $scope.sensorsDropdownTranslation = {
-        buttonDefaultText: 'Выбрать Сенсоры'
-    };
-
-    /*$scope.sensorsDropdownEvents = {
-        onItemSelect: $scope.addSensor()
-    };*/
-
+    $scope.sensors = [[],[],[],[]];
 
     $scope.addChart = function () {
         if($scope.charsQuantity.length < 4){
@@ -140,19 +98,7 @@ function MainCtrl($scope) {
         else throw new Error("Нельзя убрать единственный график!");
     };
 
-    $scope.addSensor = function () {
-        if($scope.sensors[0].length < 4){
-            $scope.sensors[0].push($scope.sensorsList[2]); //todo:remove Magic numbers
-        }
-        else throw new Error("Достигнуто максимальное количество сенсоров");
-    };
 
-    $scope.removeSensor = function () {
-        if($scope.sensors[0].length > 1){
-            $scope.sensors[0].pop();
-        }
-        else throw new Error("Нельзя убрать единственный сенсор!");
-    };
 
     // Watchers
     $scope.$watch('dates', watchDates, true);
@@ -194,7 +140,6 @@ function    chartDir() {
             }
 
             function watchSensors() {
-                console.log("так, блэт");
                 var sensors = [];
                 var dataset = [];
                 var options = {fill:false};
@@ -209,6 +154,7 @@ function    chartDir() {
                 console.log("Series", sensors);
                 scope.recalculate();
 
+                scope.status = scope.cdSensors[scope.cdOrder-1].length;
             }
 
             function createData(elements, parts) {
@@ -236,15 +182,15 @@ function    chartDir() {
             }
 
 
-
             // dir init
             /*const ctrl = this;
             ctrl.sensorsQuantity = scope.cdSensors[scope.cdOrder-1].length;*///todo: scoping like you are a normal person, not like this
 
-            scope.status = scope.cdSensors[scope.cdOrder-1].length;
+
+
 
             // chart init
-            scope.type = "line";
+            scope.type = 'line';
             scope.options = {
                 scales: {
                     xAxes: [{
@@ -288,11 +234,66 @@ function    chartDir() {
 function  sensorsDir() {
     return {
         restrict: 'E',
-        scope: true,
-        controller: MainCtrl,
-        link: function (scope, $element, $attrs) {
-
+        scope: {
+            sensorsAll: '=',
+            sensorsIndex: '@'
         },
+        controller:['$scope' ,function ($scope) {
+
+            var sensorsList = [
+                {
+                    "id": 13,
+                    "name": "temperature_1",
+                    "nameRus": "температура 1"
+                },
+                {
+                    "id": 22,
+                    "name": "temperature_2",
+                    "nameRus": "температура 2"
+                },
+                {
+                    "id": 43,
+                    "name": "temperature_3",
+                    "nameRus": "температура 3"
+                }];
+
+
+
+            // sensors
+            var reachedSensorsMax = function (item) {
+                throw new Error("Достигнуто максимальное количество сенсоров");
+            };
+
+            var selectSensor = function (option) {
+                sensorsList.forEach(function (item, i) {
+                   if(option.id == item.id)
+                       option.nameRus = item.nameRus;
+                });
+            };
+
+
+            $scope.sensorsDropdownModel = $scope.sensorsAll[$scope.sensorsIndex-1];
+            $scope.sensorsDropdownData = sensorsList;
+            $scope.sensorsDropdownSettings = {
+                /*showEnableSearchButton: true,*/
+                idProp: 'id',
+                displayProp: 'nameRus',
+                searchField: 'nameRus',
+                enableSearch: true,
+                selectionLimit: 4,
+                selectedToTop: true
+            };
+            $scope.sensorsDropdownTranslation = {
+                buttonDefaultText: 'Выбрать Сенсоры',
+                uncheckAll: 'Убрать все',
+                selectionCount: 'Выбрано',
+                dynamicButtonTextSuffix: 'Выбран'
+            };
+            $scope.sensorsDropdownEvents = {
+                onMaxSelectionReached: reachedSensorsMax,
+                onItemSelect: selectSensor
+            };
+        }],
         templateUrl: "dashboard/sensors-dir.template.html"
     }
 }
@@ -320,7 +321,6 @@ angular.module('dashboard')
 
     .directive('chartDir', chartDir)
     .directive('sensorsDir', sensorsDir)
-    /*.factory('Sensors')*/
 
     .component('dashboard', {
         templateUrl: "dashboard/dashboard.template.html",
