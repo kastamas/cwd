@@ -1,6 +1,6 @@
 'use strict';
 
-function MainCtrl($scope) {
+function MainCtrl($scope, $sce, $log,  freeWeatherApi) {
     const ctrl = this;
 
     function watchDates(newValue, oldValue) {
@@ -77,6 +77,42 @@ function MainCtrl($scope) {
 
 
 
+    /*Weatherman*/
+
+
+
+
+
+
+/*
+
+    $scope.dynamicPopover = {
+        content: 'Hello, World!',
+        templateUrl: 'myPopoverTemplate.html',
+        title: 'Title'
+    };
+
+    $scope.placement = {
+        options: [
+            'top',
+            'top-left',
+            'top-right',
+            'bottom',
+            'bottom-left',
+            'bottom-right',
+            'left',
+            'left-top',
+            'left-bottom',
+            'right',
+            'right-top',
+            'right-bottom'
+        ],
+        selected: 'top'
+    };
+
+    $scope.htmlPopover = $sce.trustAsHtml('<b style="color: red">I can</b> have <div class="label label-success">HTML</div> content');
+*/
+
     // init
     $scope.chars = [1]; /// array with chars id's
     $scope.dates = new DatePicker();
@@ -140,6 +176,7 @@ function    chartDir() {
         scope: {
             cdLabels: '=',
             cdSensors: '=',
+            cdSensorsAllData: '=',
             cdOrder: '@',
             cdRemove: '=',
             cdId: '@'
@@ -208,7 +245,6 @@ function    chartDir() {
                 for (i=0; i < parts; i++) {
                     data.push([]);
                     for( j=0; j < elements; j++) {
-
                         data[i].push(randomScalingFactor());
                     }
                 }
@@ -219,13 +255,26 @@ function    chartDir() {
 
             // dir init
             /*const ctrl = this;
-            ctrl.sensorsQuantity = scope.cdSensors[scope.cdOrder-1].length;*///todo: scoping like you are a normal person, not like this
+            ctrl.sensorsQuantity = $scope.cdSensors[scope.cdOrder-1].length;*///todo: scoping like you are a normal person, not like this
 
 
+            scope.changeColour = function (index) {
+                scope.colors.splice(index,1,'#000000');
+            };
 
 
             // chart init
             scope.type = 'line';
+            scope.colors = [
+                '#97BBCD', // blue
+                '#DCDCDC', // light grey
+                '#F7464A', // red
+                '#46BFBD', // green
+                '#FDB45C', // yellow
+                '#949FB1', // grey
+                '#4D5360'  // dark grey
+            ]; // default colors
+
             scope.options = {
                 scales: {
                     xAxes: [{
@@ -270,6 +319,7 @@ function  sensorsDir() {
         restrict: 'E',
         scope: {
             sensorsAll: '=',
+            testAttr: '=',
             sensorsOrigin: '@'
         },
         controller:['$scope' ,function ($scope) {
@@ -367,7 +417,7 @@ angular.module('dashboard')
         });
     }])
 
-    .controller("MainCtrl", ['$scope', MainCtrl])
+    .controller("MainCtrl", ['$scope', '$sce', '$log', 'freeWeatherApi', MainCtrl])
 
     .directive('chartDir', chartDir)
     .directive('sensorsDir', sensorsDir)
