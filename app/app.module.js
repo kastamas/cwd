@@ -9,6 +9,7 @@ angular.module('cwdApp', [
     'rbarilani.freeWeatherApi',
     'dashboard'
 ])
+/* .constant('API_KEY', 'ffa5d34a812844e6b99195536170606') todo: store constants*/
 
     .config(function (freeWeatherApiProvider) {
         freeWeatherApiProvider
@@ -32,6 +33,7 @@ angular.module('cwdApp', [
             });
 
     })
+
     .service('weatherService', ['$http','freeWeatherApi', function ($http, freeWeatherApi) {
         this.get = async() => {
             let data = await getWeather();
@@ -44,7 +46,9 @@ angular.module('cwdApp', [
             let data = await getWeather();
 
             data = data.data[0];//localtestingonly
-            var sensorsAllData = Object.assign({}, data.data.weather[0]);
+            var sensorsAllData = Object.assign({}, data.data.weather[0]); // clon
+
+            // deleting needless object-properties
             delete sensorsAllData.date;
             delete sensorsAllData.astronomy;
             delete sensorsAllData.hourly;
@@ -67,10 +71,10 @@ angular.module('cwdApp', [
             url: '',
             component: 'dashboard',
             resolve: {
-                weather: async (weatherService ) => {
+                weatherData: async (weatherService ) => {
                     return await weatherService.get();
                 },
-                sensorsLabels: async (weatherService) => {
+                sensorsNames: async (weatherService) => {
                     return await weatherService.getLabels();
                 }
             }

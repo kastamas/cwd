@@ -53,9 +53,9 @@ hr.thin {
 
 p.annotation {
     float: right;
+    margin-top: 10px;
 }
 
 footer > a  {
-    margin-top: 10px;
     cursor: pointer;
 }

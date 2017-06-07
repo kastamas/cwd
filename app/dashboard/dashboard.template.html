@@ -1,9 +1,4 @@
 <!--Debug zone-->
-<div class="row">
-   <!--<pre class="col-md-2">{{chars}}</pre><pre class="col-md-3">{{sensors | json}}</pre>-->
-    <!--<pre class="col-md-12">{{sensorsAllData |json }}</pre>--><!--hmm-->
-   <!-- <pre class="col-md-4">{{dates.start}}</pre>-->
-</div>
 
 <!--<h4>Dynamic</h4> //todo: colors picker
 <div class="form-group">
@@ -77,8 +72,8 @@
 <!--Charts-->
 <div class="container">
     <div class="row ">
-        <div class="col-lg-6" ng-repeat="item in chars">
-            <data-chart-dir cd-id="{{item}}" cd-order="{{$index+1}}" cd-labels="$ctrl.labels" cd-remove="removeChart" cd-sensors="sensors" cd-date="" cd-sensors-all-data="$ctrl.sensorsLabels"></data-chart-dir>
+        <div class="col-lg-6" ng-repeat="item in charts">
+            <data-chart-dir dashboard-dates="dates" dashboard-data-values="weatherDataValues" chart-id="{{item}}" chart-order="{{$index+1}}" chart-remove="removeChart" cd-sensors="sensors"   cd-sensors-all-data="$ctrl.sensorsNames" ></data-chart-dir>
         </div>
     </div>
 </div>
