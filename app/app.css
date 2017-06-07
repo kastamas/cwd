@@ -50,3 +50,12 @@ hr.thin {
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+p.annotation {
+    float: right;
+}
+
+footer > a  {
+    margin-top: 10px;
+    cursor: pointer;
+}

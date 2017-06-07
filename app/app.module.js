@@ -32,16 +32,18 @@ angular.module('cwdApp', [
             });
 
     })
-    .service('weatherService', ['freeWeatherApi', function (freeWeatherApi) {
+    .service('weatherService', ['$http','freeWeatherApi', function ($http, freeWeatherApi) {
         this.get = async() => {
             let data = await getWeather();
 
+            data = data.data[0];//localtestingonly!
             return data.data.weather;
         };
 
         this.getLabels = async() => {
             let data = await getWeather();
 
+            data = data.data[0];//localtestingonly
             var sensorsAllData = Object.assign({}, data.data.weather[0]);
             delete sensorsAllData.date;
             delete sensorsAllData.astronomy;
@@ -52,8 +54,10 @@ angular.module('cwdApp', [
         };
 
         let getWeather = async() => {
-            return await freeWeatherApi
-                .localWeather('Paris', {});
+            /*return await freeWeatherApi
+                .localWeather('Paris', {});*/
+
+            return await $http.get('data/weatherData.json');
         };
     }])
 
