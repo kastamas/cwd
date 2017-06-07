@@ -78,7 +78,7 @@
 <div class="container">
     <div class="row ">
         <div class="col-lg-6" ng-repeat="item in chars">
-            <data-chart-dir cd-id="{{item}}" cd-order="{{$index+1}}" cd-labels="$ctrl.labels" cd-remove="removeChart" cd-sensors="sensors" cd-sensors-all-data="sensorsAllData"></data-chart-dir>
+            <data-chart-dir cd-id="{{item}}" cd-order="{{$index+1}}" cd-labels="$ctrl.labels" cd-remove="removeChart" cd-sensors="sensors" cd-date="" cd-sensors-all-data="$ctrl.sensorsLabels"></data-chart-dir>
         </div>
     </div>
 </div>

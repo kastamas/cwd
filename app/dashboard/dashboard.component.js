@@ -1,45 +1,45 @@
 'use strict';
 
-function MainCtrl($scope, $sce, $log,  freeWeatherApi) {
+function MainCtrl($scope, $sce, $log) {
     const ctrl = this;
 
     function watchDates(newValue, oldValue) {
         //обработка исключительной ситуации
-        if(newValue.start === null || newValue.end === null){
+        if (newValue.start === null || newValue.end === null) {
             throw new Error('Нужно выбрать даты, чтобы начать построение графиков!');
         }//todo: improve errors displaying
 
-        if(oldValue.start === null || oldValue.end === null){
+        if (oldValue.start === null || oldValue.end === null) {
             ctrl.labels = createLabels(newValue);
             return;
         }
 
         var oldPeriod = oldValue.getPeriod();
-        var newPeriod =  newValue.getPeriod();
+        var newPeriod = newValue.getPeriod();
         var difference = newPeriod - oldPeriod;
         var i;
 
-        if(newPeriod < 1) // Todo: B<A situation
+        if (newPeriod < 1) // Todo: B<A situation
             throw new Error('Для рассчётов, нужно чтобы был выбран период хотя бы из 2-х дней!');
 
-        if(difference > 0){// если разница больше, период увеличился
-            if(oldValue.start > newValue.start){
+        if (difference > 0) {// если разница больше, период увеличился
+            if (oldValue.start > newValue.start) {
                 //старт сдвинулся  влево
-                for(i = 1; i <= difference; i++)
+                for (i = 1; i <= difference; i++)
                     ctrl.labels.unshift(createLabel(oldValue, -i));
             } else {
                 //конец cдвинулся  вправо
-                for(i = 1; i <= difference; i++)
+                for (i = 1; i <= difference; i++)
                     ctrl.labels.push(createLabel(newValue, oldPeriod + i));
             }
         } else {
-            if(oldValue.start < newValue.start){
+            if (oldValue.start < newValue.start) {
                 //старт сдвинулся  вправо
-                for(; difference < 0; difference++)
+                for (; difference < 0; difference++)
                     ctrl.labels.shift();
             } else {
                 //конец cдвинулся  влево
-                for(; difference < 0; difference++)
+                for (; difference < 0; difference++)
                     ctrl.labels.pop();
             }
         }
@@ -47,14 +47,14 @@ function MainCtrl($scope, $sce, $log,  freeWeatherApi) {
     }
 
     function createLabel(date, days) {
-        return new Date(date.start.getFullYear(), date.start.getMonth(), date.start.getDate()+days).toLocaleDateString();
+        return new Date(date.start.getFullYear(), date.start.getMonth(), date.start.getDate() + days).toLocaleDateString();
     }
 
     function createLabels(date) {
         var labels = [];
         var period = date.getPeriod();
 
-        for(var i=0; i <= period; i++) {
+        for (var i = 0; i <= period; i++) {
             labels.push(createLabel(date, i));
         }
 
@@ -76,54 +76,46 @@ function MainCtrl($scope, $sce, $log,  freeWeatherApi) {
     }
 
 
+    /*
 
-    /*Weatherman*/
+     $scope.dynamicPopover = {
+     content: 'Hello, World!',
+     templateUrl: 'myPopoverTemplate.html',
+     title: 'Title'
+     };
 
+     $scope.placement = {
+     options: [
+     'top',
+     'top-left',
+     'top-right',
+     'bottom',
+     'bottom-left',
+     'bottom-right',
+     'left',
+     'left-top',
+     'left-bottom',
+     'right',
+     'right-top',
+     'right-bottom'
+     ],
+     selected: 'top'
+     };
 
-
-
-
-
-/*
-
-    $scope.dynamicPopover = {
-        content: 'Hello, World!',
-        templateUrl: 'myPopoverTemplate.html',
-        title: 'Title'
-    };
-
-    $scope.placement = {
-        options: [
-            'top',
-            'top-left',
-            'top-right',
-            'bottom',
-            'bottom-left',
-            'bottom-right',
-            'left',
-            'left-top',
-            'left-bottom',
-            'right',
-            'right-top',
-            'right-bottom'
-        ],
-        selected: 'top'
-    };
-
-    $scope.htmlPopover = $sce.trustAsHtml('<b style="color: red">I can</b> have <div class="label label-success">HTML</div> content');
-*/
+     $scope.htmlPopover = $sce.trustAsHtml('<b style="color: red">I can</b> have <div class="label label-success">HTML</div> content');
+     */
 
     // init
     $scope.chars = [1]; /// array with chars id's
     $scope.dates = new DatePicker();
     ctrl.labels = createLabels($scope.dates);
 
-    $scope.sensors = [ [] ];//todo:improve
+    $scope.sensors = [[]];//todo:improve
 
     $scope.addChart = function () {
         var length = $scope.chars.length;
-        if(length < 4){
-            $scope.chars.push(($scope.chars[length-1] + 1));
+        if (length < 4) {
+            $scope.chars.push(($scope.chars[length - 1] + 1));
             $scope.sensors.push([]);
         }
         else throw new Error("Достигнуто максимальное количество графиков");
@@ -134,29 +126,29 @@ function MainCtrl($scope, $sce, $log,  freeWeatherApi) {
         var first = 0;
 
         if (length > 1)
-        switch (index){
-            case length - 1: {
-                $scope.chars = $scope.chars.slice(0,index);
-                $scope.sensors.pop();
-                break;
+            switch (index) {
+                case length - 1: {
+                    $scope.chars = $scope.chars.slice(0, index);
+                    $scope.sensors.pop();
+                    break;
+                }
+                case first: {
+                    $scope.chars = $scope.chars.slice(1);
+                    $scope.sensors.shift();
+                    break;
+                }
+                default: {
+                    var begin = $scope.chars.slice(0, index);
+                    var end = $scope.chars.slice(index + 1);
+                    $scope.chars = begin.concat(end);
+                    $scope.sensors.splice(index, 1);
+                }
             }
-            case first: {
-                $scope.chars = $scope.chars.slice(1);
-                $scope.sensors.shift();
-                break;
-            }
-            default: {
-                var begin = $scope.chars.slice(0,index);
-                var end = $scope.chars.slice(index+1);
-                $scope.chars = begin.concat(end);
-                $scope.sensors.splice(index, 1);
-            }
-        }
         else  throw new Error("Должен остаться хотя-бы один график!");
 
         console.log("Length: " + length + " index: " + index);
 
-        if(length > 1) {//если есть хотя бы один элемент(график)
+        if (length > 1) {//если есть хотя бы один элемент(график)
 
             //$scope.charsQuantity = [$scope.charsQuantity.slice(0,index)].push($scope.charsQuantity.slice(index+1));//создаю новый массив = старому - index;
         }
@@ -164,13 +156,12 @@ function MainCtrl($scope, $sce, $log,  freeWeatherApi) {
     };
 
 
-
     // Watchers
     $scope.$watch('dates', watchDates, true);
 }
 
 
-function    chartDir() {
+function chartDir() {
     return {
         restrict: 'E',
         scope: {
@@ -179,30 +170,30 @@ function    chartDir() {
             cdSensorsAllData: '=',
             cdOrder: '@',
             cdRemove: '=',
-            cdId: '@'
+            cdId: '@',
+            cdDate: '='
         },
         replace: false,
         link: function (scope, $element, $attrs) {//манипуляция с DOM ToDO: засунуть биндинги в контроллёр
 
-
             function watchLabels(newValue, oldValue) {
                 var difference = (newValue.length - oldValue.length);
-                var parts = scope.cdSensors[scope.cdOrder-1].length;
+                var parts = scope.cdSensors[scope.cdOrder - 1].length;
 
                 /*if(difference > 0) {// период увеличился todo:improve!
-   Order}                 if(newValue[0] == oldValue[0])// Первый элемент не тронут
-                        scope.data[0] = scope.data[0].concat(createData(difference, parts));
-                    else
-                        scope.data[0] = createData(difference, parts).concat(scope.data[0]); //todo: fix up
-                } else { // уменьшился, diff - отрицательная или 0
-                    if(newValue[0] == oldValue[0])// Первый элемент не тронут
-                        for(; difference < 0; difference++)
-                            scope.data[0].pop();
-                    else
-                        for(; difference < 0; difference++)
-                            scope.data[0].shift();
-                }*/
-                scope.data = createData(scope.cdLabels.length, scope.cdSensors[scope.cdOrder-1].length);
+                 Order}                 if(newValue[0] == oldValue[0])// Первый элемент не тронут
+                 scope.data[0] = scope.data[0].concat(createData(difference, parts));
+                 else
+                 scope.data[0] = createData(difference, parts).concat(scope.data[0]); //todo: fix up
+                 } else { // уменьшился, diff - отрицательная или 0
+                 if(newValue[0] == oldValue[0])// Первый элемент не тронут
+                 for(; difference < 0; difference++)
+                 scope.data[0].pop();
+                 else
+                 for(; difference < 0; difference++)
+                 scope.data[0].shift();
+                 }*/
+                scope.data = createData(scope.cdLabels.length, scope.cdSensors[scope.cdOrder - 1].length);
 
                 scope.labels = scope.cdLabels;// binding works fine
             }
@@ -210,41 +201,39 @@ function    chartDir() {
             function watchSensors() {
                 var sensors = [];
                 var dataset = [];
-                var options = {fill:false};
-
-
+                var options = {fill: false};
 
 
                 scope.cdSensors[scope.cdOrder - 1].forEach(function (item, i) {
-                    sensors.push(item.nameRus);
+                    sensors.push(item.name);
                     dataset.push(options);
                 });
 
                 scope.series = sensors;
 
-                dataset.length == 0 ? scope.dataset = [] :  scope.dataset = dataset; //todo: isn't works like i want it, fix it
+                dataset.length == 0 ? scope.dataset = [] : scope.dataset = dataset; //todo: isn't works like i want it, fix it
 
                 scope.recalculate();
 
-                scope.status = scope.cdSensors[scope.cdOrder-1].length;
+                scope.status = scope.cdSensors[scope.cdOrder - 1].length;
             }
 
             function createData(elements, parts) {
-                var randomScalingFactor = function() {
+                var randomScalingFactor = function () {
                     return Math.round(Math.random() * 100);
                 };
 
-                if(parts === undefined){
+                if (parts === undefined) {
                     parts = 1;
                 }
                 //if (parts == 1 && elements == 1) return randomScalingFactor();//todo:improve
 
-                var data=[];
-                var i,j;
+                var data = [];
+                var i, j;
 
-                for (i=0; i < parts; i++) {
+                for (i = 0; i < parts; i++) {
                     data.push([]);
-                    for( j=0; j < elements; j++) {
+                    for (j = 0; j < elements; j++) {
                         data[i].push(randomScalingFactor());
                     }
                 }
@@ -255,11 +244,11 @@ function    chartDir() {
 
             // dir init
             /*const ctrl = this;
-            ctrl.sensorsQuantity = $scope.cdSensors[scope.cdOrder-1].length;*///todo: scoping like you are a normal person, not like this
+             ctrl.sensorsQuantity = $scope.cdSensors[scope.cdOrder-1].length;*///todo: scoping like you are a normal person, not like this
 
 
             scope.changeColour = function (index) {
-                scope.colors.splice(index,1,'#000000');
+                scope.colors.splice(index, 1, '#000000');
             };
 
 
@@ -301,7 +290,7 @@ function    chartDir() {
 
             // actions
             scope.recalculate = function () {
-                scope.data = createData(scope.cdLabels.length, scope.cdSensors[scope.cdOrder-1].length);//todo: not obvious that scope.status is sensorsQuantity
+                scope.data = createData(scope.cdLabels.length, scope.cdSensors[scope.cdOrder - 1].length);//todo: not obvious that scope.status is sensorsQuantity
             };
 
 
@@ -314,49 +303,21 @@ function    chartDir() {
 }
 
 
-function  sensorsDir() {
+function sensorsDir() {
     return {
         restrict: 'E',
         scope: {
             sensorsAll: '=',
-            testAttr: '=',
+            sensorsAllData: '=',
             sensorsOrigin: '@'
         },
-        controller:['$scope' ,function ($scope) {
-
-            var sensorsList = [
-                {
-                    "id": 13,
-                    "name": "temperature_1",
-                    "nameRus": "температура 1"
-                },
-                {
-                    "id": 22,
-                    "name": "temperature_2",
-                    "nameRus": "температура 2"
-                },
-                {
-                    "id": 43,
-                    "name": "temperature_3",
-                    "nameRus": "свет 1"
-                },
-                {
-                    "id": 44,
-                    "name": "temperature_3",
-                    "nameRus": "свет 2"
-                },
-                {
-                    "id": 45,
-                    "name": "temperature_3",
-                    "nameRus": "влажность 1"
-                },
-                {
-                    "id": 47,
-                    "name": "temperature_3",
-                    "nameRus": "влажность 2"
-                }];
-
-
+        controller: ['$scope', function ($scope) {
+            var sensorsList = $scope.sensorsAllData.map((item, i) => {
+                return {
+                    name: item,
+                    id: i
+                }
+            });
 
             // sensors
             var reachedSensorsMax = function (item) {
@@ -365,19 +326,19 @@ function  sensorsDir() {
 
             var selectSensor = function (option) {
                 sensorsList.forEach(function (item, i) {
-                   if(option.id == item.id)
-                       option.nameRus = item.nameRus;
+                    if (option.id == item.id)
+                        option.name = item.name;
                 });
             };
 
 
-            $scope.sensorsDropdownModel = $scope.sensorsAll[$scope.sensorsOrigin-1];
+            $scope.sensorsDropdownModel = $scope.sensorsAll[$scope.sensorsOrigin - 1];
             $scope.sensorsDropdownData = sensorsList;
             $scope.sensorsDropdownSettings = {
                 /*showEnableSearchButton: true,*/
                 idProp: 'id',
-                displayProp: 'nameRus',
-                searchField: 'nameRus',
+                displayProp: 'name',
+                searchField: 'name',
                 enableSearch: true,
                 selectionLimit: 4,
                 selectedToTop: true,
@@ -400,12 +361,13 @@ function  sensorsDir() {
 
 angular.module('dashboard')
 
-    // Optional configuration for All Charts
+// Optional configuration for All Charts
+
     .config(['ChartJsProvider', function (ChartJsProvider) {
         // Configure all charts
         ChartJsProvider.setOptions({
             responsive: true,
-            legend: {display:true},
+            legend: {display: true},
             tooltips: {
                 mode: 'index',
                 intersect: true
@@ -417,12 +379,16 @@ angular.module('dashboard')
         });
     }])
 
-    .controller("MainCtrl", ['$scope', '$sce', '$log', 'freeWeatherApi', MainCtrl])
+    .controller("MainCtrl", ['$scope', '$sce', '$log', MainCtrl])
 
     .directive('chartDir', chartDir)
     .directive('sensorsDir', sensorsDir)
 
     .component('dashboard', {
         templateUrl: "dashboard/dashboard.template.html",
-        controller: 'MainCtrl'
+        controller: 'MainCtrl',
+        bindings: {
+            weather: '<',
+            sensorsLabels: '<'
+        }
     });

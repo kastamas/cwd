@@ -7,7 +7,6 @@ angular.module('cwdApp', [
     'angularjs-dropdown-multiselect',
     'ui.bootstrap',
     'rbarilani.freeWeatherApi',
-
     'dashboard'
 ])
 
@@ -33,13 +32,44 @@ angular.module('cwdApp', [
             });
 
     })
+    .service('weatherService', ['freeWeatherApi', function (freeWeatherApi) {
+        this.get = async() => {
+            let data = await getWeather();
 
+            return data.data.weather;
+        };
+
+        this.getLabels = async() => {
+            let data = await getWeather();
+
+            var sensorsAllData = Object.assign({}, data.data.weather[0]);
+            delete sensorsAllData.date;
+            delete sensorsAllData.astronomy;
+            delete sensorsAllData.hourly;
+            delete sensorsAllData.uvIndex;
+
+            return Object.keys(sensorsAllData);
+        };
+
+        let getWeather = async() => {
+            return await freeWeatherApi
+                .localWeather('Paris', {});
+        };
+    }])
 
     .config(function ($stateProvider) {
         var defaultState = {
             name: 'default',
             url: '',
-            component: 'dashboard'
+            component: 'dashboard',
+            resolve: {
+                weather: async (weatherService ) => {
+                    return await weatherService.get();
+                },
+                sensorsLabels: async (weatherService) => {
+                    return await weatherService.getLabels();
+                }
+            }
         };
 
         $stateProvider.state(defaultState);
