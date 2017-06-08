@@ -7,9 +7,10 @@ angular.module('cwdApp', [
     'angularjs-dropdown-multiselect',
     'ui.bootstrap',
     'rbarilani.freeWeatherApi',
+
     'dashboard'
 ])
-/* .constant('API_KEY', 'ffa5d34a812844e6b99195536170606') todo: store constants*/
+ .constant('locationName', 'Petrozavodsk') //todo: store constants
 
     .config(function (freeWeatherApiProvider) {
         freeWeatherApiProvider
@@ -34,7 +35,7 @@ angular.module('cwdApp', [
 
     })
 
-    .service('weatherService', ['$http','freeWeatherApi', function ($http, freeWeatherApi) {
+    .service('weatherService', ['$http','freeWeatherApi', 'locationName', function ($http, freeWeatherApi, locationName) {
         this.get = async() => {
             let data = await getWeather();
 
@@ -59,7 +60,7 @@ angular.module('cwdApp', [
 
         let getWeather = async() => {
             /*return await freeWeatherApi
-                .localWeather('Paris', {});*/
+                .localWeather('locationName', {});*/
 
             return await $http.get('data/weatherData.json');
         };

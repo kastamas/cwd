@@ -1,6 +1,6 @@
 'use strict';
 
-function MainCtrl($scope) {
+function MainCtrl($scope, locationName) {
     const ctrl = this;
 
     function Dates() {
@@ -8,51 +8,24 @@ function MainCtrl($scope) {
         let oneDay = 24 * 60 * 60 * 1000;
         let today = new Date();
 
-
+        this.today = today;
         this.start = today;
         this.end = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 6, today.getHours(), today.getMinutes());
 
         this.getPeriod = function () {
             return Math.round((this.end - this.start) / (oneDay));
-        }
+        };
+        this.margin = Math.round((this.start - this.today) / (oneDay));
 
     }
 
-
-    /*
-
-     $scope.dynamicPopover = {
-     content: 'Hello, World!',
-     templateUrl: 'myPopoverTemplate.html',
-     title: 'Title'
-     };
-
-     $scope.placement = {
-     options: [
-     'top',
-     'top-left',
-     'top-right',
-     'bottom',
-     'bottom-left',
-     'bottom-right',
-     'left',
-     'left-top',
-     'left-bottom',
-     'right',
-     'right-top',
-     'right-bottom'
-     ],
-     selected: 'top'
-     };
-
-     $scope.htmlPopover = $sce.trustAsHtml('<b style="color: red">I can</b> have <div class="label label-success">HTML</div> content');
-     */
 
     // init
     $scope.charts = [1]; /// array with chars id's
     $scope.dates = new Dates();
     $scope.sensors = [[]];//todo:improve
 
+    $scope.location = locationName;
 
     // work with weather data
     // create array of objects
@@ -115,22 +88,19 @@ function chartDir() {
     return {
         restrict: 'E',
         scope: {
-            dashboardDates: '=',//too: @ scoping
+            dashboardDates: '=',
             dashboardDataValues: '=',
             chartId: '@',
             chartOrder: '@',
-            chartRemove: '=', //todo: & scoping
+            chartRemove: '=',
             cdSensors: '=',
             cdSensorsAllData: '='
         },
         replace: false,
-        controller: function () {//todo data must be binded here
-
-        },
-        link: function ($scope, $element, $attrs) {//манипуляция с DOM ToDO: засунуть биндинги в контроллёр
+        controller: function ($scope) {
 
             function watchDates(newValue, oldValue) {
-                //обработка исключительной ситуации
+                //обработка исключительных ситуации greate if's wall todo: improve it
                 if (newValue.start === null || newValue.end === null) {
                     throw new Error('Нужно выбрать даты, чтобы начать построение графиков!');
                 }//todo: improve errors displaying
@@ -140,13 +110,25 @@ function chartDir() {
                     return;
                 }
 
+                if (newValue.start < newValue.today){
+                    throw new Error('Нельзя выбрать дату из прошлого!');
+                }
+
+                if (newValue.getPeriod($scope.dashboardDates.today, $scope.dashboardDates.end) > 13){
+                    throw new Error('Нет данных, дальше чем за 2 недели!')
+                }
+
+
+
                 var oldPeriod = oldValue.getPeriod();
                 var newPeriod = newValue.getPeriod();
                 var difference = newPeriod - oldPeriod;
                 var i;
 
-                if (newPeriod < 1) // Todo: B<A situation
+                if (newPeriod < 1)
                     throw new Error('Для рассчётов, нужно чтобы был выбран период хотя бы из 2-х дней!');
+
+
 
                 if (difference > 0) {// если разница больше, период увеличился
                     if (oldValue.start > newValue.start) {
@@ -161,8 +143,11 @@ function chartDir() {
                 } else {
                     if (oldValue.start < newValue.start) {
                         //старт сдвинулся  вправо
-                        for (; difference < 0; difference++)
+                        for (; difference < 0; difference++){
                             $scope.labels.shift();
+
+                        }
+
                     } else {
                         //конец cдвинулся  влево
                         for (; difference < 0; difference++)
@@ -172,35 +157,14 @@ function chartDir() {
 
             }
 
-            /*  function watchLabels(newValue, oldValue) {
-             var difference = (newValue.length - oldValue.length);
-             var parts =$scope.cdSensors[scope.chartOrder - 1].length;
-
-             /!*if(difference > 0) {// период увеличился todo:improve!
-             Order}                 if(newValue[0] == oldValue[0])// Первый элемент не тронут
-             $scope.data[0] =$scope.data[0].concat(createData(difference, parts));
-             else
-             $scope.data[0] = createData(difference, parts).concat(scope.data[0]); //todo: fix up
-             } else { // уменьшился, diff - отрицательная или 0
-             if(newValue[0] == oldValue[0])// Первый элемент не тронут
-             for(; difference < 0; difference++)
-             $scope.data[0].pop();
-             else
-             for(; difference < 0; difference++)
-             $scope.data[0].shift();
-             }*!/
-             $scope.data = createData(scope.labels.length,$scope.cdSensors[scope.chartOrder - 1].length);
-
-             $scope.labels =$scope.labels;// binding works fine
-             }
-             *///todo: it may be useful
-
             function watchSensors() {
                 var sensorsNames = [];
                 var dataset = [];
                 var data = [];
                 var options = {fill: false};
                 var sensors = $scope.cdSensors[$scope.chartOrder - 1];
+
+
 
                 if(sensors.length < 1){ // crutch
                     $scope.data = [0];
@@ -213,24 +177,24 @@ function chartDir() {
                     sensorsNames.push(item.name);
                     dataset.push(options);
                     $scope.dashboardDataValues.forEach(function (sensor, j) {
-                       if(sensor.name == item.name){
-                           data.push(sensor.values);
-                       }
+                        if(sensor.name == item.name){
+                            data.push(sensor.values);
+                        }
                     });
                 });
 
                 $scope.series = sensorsNames; //array of sensor's names
-                console.log("series", $scope.series);
 
-                dataset.length == 0 ? $scope.dataset = undefined : $scope.dataset = dataset; //todo: isn't works like i want it, fix it
+                dataset.length == 0
+                    ? $scope.dataset = undefined
+                    : $scope.dataset = dataset; //todo: it isn't works
 
-                console.log("dataset",$scope.dataset);
-
+                /*($scope.dashboardDates.start, $scope.dashboardDates.end)*/
                 $scope.data = data;
-                console.log("data",data);
                 $scope.options.legend.display = true;
                 $scope.status = $scope.cdSensors[$scope.chartOrder - 1].length;
             }
+
 
             function createLabel(date, days) {
                 return new Date(date.start.getFullYear(), date.start.getMonth(), date.start.getDate() + days).toLocaleDateString();
@@ -247,33 +211,6 @@ function chartDir() {
                 return labels;
             }
 
-
-            // old function for creating randomized values
-            /*function createData(elements, parts, option) {
-                var randomScalingFactor = function () {
-                    return Math.round(Math.random() * 100);
-                };
-
-                var data = [];
-                var i, j;
-
-                if (parts === undefined) {
-                    parts = 1;
-                }
-
-                //if (parts == 1 && elements == 1) return randomScalingFactor();//todo:improve
-
-                for (i = 0; i < parts; i++) {
-                    data.push([]);
-                    for (j = 0; j < elements; j++) {
-                        data[i].push(randomScalingFactor());
-                    }
-                }
-
-                return data;
-            }
-            */
-
             // init
             $scope.labels = createLabels($scope.dashboardDates);
 
@@ -288,20 +225,21 @@ function chartDir() {
                 '#949FB1', // grey
                 '#4D5360'  // dark grey
             ]; // default colors
+
             $scope.options = {
                 scales: {
                     xAxes: [{
                         display: true,
                         scaleLabel: {
                             display: true,
-                            labelString: 'День'
+                            labelString: 'Day'
                         }
                     }],
                     yAxes: [{
                         display: true,
                         scaleLabel: {
                             display: true,
-                            labelString: 'Значение сенсора'
+                            labelString: 'Value'
                         }
                     }]
                 },
@@ -317,18 +255,11 @@ function chartDir() {
                 $scope.colors.splice(index, 1, '#000000');
             };
 
-            // actions
-            $scope.recalculate = function () {
-                $scope.data = createData($scope.labels.length, $scope.cdSensors[$scope.chartOrder - 1].length);//todo: not obvious that$scope.status is sensorsQuantity
-            };
-
 
 
             // Watchers
-            /*scope.$watchCollection('labels', watchLabels);*/
             $scope.$watch('dashboardDates', watchDates, true);
             $scope.$watchCollection('cdSensors[chartOrder-1]', watchSensors);
-
         },
         templateUrl: "dashboard/chart-dir.template.html"
     }
@@ -362,7 +293,7 @@ function sensorsDir() {
                 });
             };
 
-
+            // configure sensors
             $scope.sensorsDropdownModel = $scope.sensorsAll[$scope.sensorsOrigin - 1];
             $scope.sensorsDropdownData = sensorsList;
             $scope.sensorsDropdownSettings = {
@@ -397,6 +328,9 @@ angular.module('dashboard')
             tooltips: {
                 mode: 'index',
                 intersect: true
+            },
+            animation: {
+                duration: 500
             }
         });
         // Configure all line charts
@@ -405,7 +339,7 @@ angular.module('dashboard')
         });
     }])
 
-    .controller("MainCtrl", ['$scope', MainCtrl])
+    .controller("MainCtrl", ['$scope','locationName', MainCtrl])
 
     .directive('chartDir', chartDir)
     .directive('sensorsDir', sensorsDir)

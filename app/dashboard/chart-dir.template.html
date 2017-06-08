@@ -1,6 +1,3 @@
-<div><!--Dir replace option saver-->
-
-<!--<pre>{{cdSensorsAllData}}</pre>-->
 <!--Interface-->
 <div class="row">
     <a style="position: absolute; cursor:pointer; margin: 8px 90px; z-index: 100;" ng-click="chartRemove(chartOrder-1)" style="top:8px" title="remove chart">[x]</a>
@@ -10,15 +7,14 @@
     <!-- <div class="col-xs-2 col-md-2" ng-if="status">
         <a class="nav-link-button" style="top:8px" ng-click="recalculate()">randomize</a>
     </div>-->
-
-    <!-- -->
+    
     <data-sensors-dir  class="col-xs-4 col-md-4 col-md-offset-2" sensors-all="cdSensors" sensors-origin="{{chartOrder}}" sensors-all-data="cdSensorsAllData">
 
     </data-sensors-dir>
     <!--<div class="col-xs-1 col-md-1">
         <p class="text-muted" style="padding-left: 0; line-height: 1.2">тип графика:</p>
     </div>-->
-    <div  class="col-xs-4 col-md-4"> <!--todo: i dunno why, but ng-if="status" collapses all-->
+    <div  class="col-xs-4 col-md-4">
         <select id="chart-type" ng-model="type"  class="form-control">
             <option value="bar">Bar chart</option>
             <option value="line">Line chart</option>
@@ -39,12 +35,3 @@
 </div>
 
 <a style="cursor: pointer" ng-click="changeColour(0)">Change color!</a>
-
-<!--
-<div class="row" ng-if="!status">
-    <div class="col-lg-12">
-
-    </div>
-</div>
-    <br>
-</div>-->
