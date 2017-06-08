@@ -196,33 +196,39 @@ function chartDir() {
              *///todo: it may be useful
 
             function watchSensors() {
-                var sensors = [];
+                var sensorsNames = [];
                 var dataset = [];
                 var data = [];
                 var options = {fill: false};
+                var sensors = $scope.cdSensors[$scope.chartOrder - 1];
+
+                if(sensors.length < 1){ // crutch
+                    $scope.data = [0];
+                    $scope.options.legend.display = false;
+                    return;
+                }
 
 
-                /*console.log($scope.dashboardDataValues);
-*/
-                $scope.cdSensors[$scope.chartOrder - 1].forEach(function (item, i) {
-                    sensors.push(item.name);
+                sensors.forEach(function (item, i) {
+                    sensorsNames.push(item.name);
                     dataset.push(options);
                     $scope.dashboardDataValues.forEach(function (sensor, j) {
                        if(sensor.name == item.name){
-
                            data.push(sensor.values);
                        }
                     });
                 });
 
-                $scope.series = sensors; //array of sensor's names
+                $scope.series = sensorsNames; //array of sensor's names
+                console.log("series", $scope.series);
 
-                dataset.length == 0 ? $scope.dataset = [] : $scope.dataset = dataset; //todo: isn't works like i want it, fix it
+                dataset.length == 0 ? $scope.dataset = undefined : $scope.dataset = dataset; //todo: isn't works like i want it, fix it
+
+                console.log("dataset",$scope.dataset);
 
                 $scope.data = data;
-                console.log(data);
-                //$scope.recalculate();
-
+                console.log("data",data);
+                $scope.options.legend.display = true;
                 $scope.status = $scope.cdSensors[$scope.chartOrder - 1].length;
             }
 
@@ -298,7 +304,8 @@ function chartDir() {
                             labelString: 'Значение сенсора'
                         }
                     }]
-                }
+                },
+                legend: {display: true}
             };
 
             // action-functions for chart
@@ -369,10 +376,7 @@ function sensorsDir() {
                 showCheckAll: false
             };
             $scope.sensorsDropdownTranslation = {
-                buttonDefaultText: 'Выбрать Сенсоры',
-                uncheckAll: 'Убрать все',
-                selectionCount: 'Выбрано',
-                dynamicButtonTextSuffix: 'Выбрано'
+                buttonDefaultText: 'Select sensors'
             };
             $scope.sensorsDropdownEvents = {
                 onMaxSelectionReached: reachedSensorsMax,
@@ -390,7 +394,6 @@ angular.module('dashboard')
         // Configure all charts
         ChartJsProvider.setOptions({
             responsive: true,
-            legend: {display: true},
             tooltips: {
                 mode: 'index',
                 intersect: true

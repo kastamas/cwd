@@ -59,3 +59,9 @@ p.annotation {
 footer > a  {
     cursor: pointer;
 }
+
+.chart-empty-message{
+    position: absolute;
+    margin: 12% 30%;
+    font-size: xx-large;
+}
