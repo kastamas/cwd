@@ -10,7 +10,7 @@ angular.module('cwdApp', [
 
     'dashboard'
 ])
- .constant('locationName', 'Petrozavodsk') //todo: store constants
+ .constant('locationName', 'Petrozavodsk')
 
     .config(function (freeWeatherApiProvider) {
         freeWeatherApiProvider
@@ -39,14 +39,14 @@ angular.module('cwdApp', [
         this.get = async() => {
             let data = await getWeather();
 
-            data = data.data[0];//localtestingonly!
+            /*data = data.data[0];*///local testing only!
             return data.data.weather;
         };
 
         this.getLabels = async() => {
             let data = await getWeather();
 
-            data = data.data[0];//localtestingonly
+           /* data = data.data[0];*///local testing only
             var sensorsAllData = Object.assign({}, data.data.weather[0]); // clon
 
             // deleting needless object-properties
@@ -59,10 +59,10 @@ angular.module('cwdApp', [
         };
 
         let getWeather = async() => {
-            /*return await freeWeatherApi
-                .localWeather('locationName', {});*/
+            return await freeWeatherApi
+                .localWeather(locationName, {});
 
-            return await $http.get('data/weatherData.json');
+           /* return await $http.get('data/weatherData.json'); local testing only*/
         };
     }])
 
