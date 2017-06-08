@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "name": "temperature_1"
+  },
+  {
+    "id": 2,
+    "name": "temperature_2"
+  },
+  {
+    "id": 3,
+    "name": "temperature_3"
+  },
+  {
+    "id": 4,
+    "name": "temperature_4"
+  },
+  {
+    "id": 5,
+    "name": "temperature_5"
+  }
+]

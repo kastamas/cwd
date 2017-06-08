@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="cwdApp">
+<head>
+    <meta charset="UTF-8">
+    <title>CWD</title>
+    <!--remove cause of new library--><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="app.css">
+
+    <script src="bower_components/angular/angular.min.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.min.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.min.js"></script>
+    <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+    <script src="bower_components/chart.js/dist/Chart.min.js"></script>
+    <script src="bower_components/angular-chart.js/dist/angular-chart.min.js"></script>
+    <script src="bower_components/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+    <script src="bower_components/angular-free-weather-api/dist/free-weather-api.min.js"></script>
+
+    <script src="app.module.js"></script>
+    <script src="dashboard/dashboard.module.js"></script>
+    <script src="dashboard/dashboard.component.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="masthead">
+            <h3 class="text-muted">Chart Widgets Dashboard</h3>
+        </div>
+
+        <!-- the app goes here -->
+        <ui-view></ui-view>
+
+        <div class="footer">
+            <!--<p>2017</p>-->
+            <a class="btn btn-default"> Tested in Chrome</a>
+            <a href="https://github.com/kastamas/cwd" class="btn btn-link">GitHub</a>
+            <p class="annotation text-muted">Weather data taken from: <a href="https://worldweatheronline.com">worldweatheronline.com</a></p>
+        </div>
+    </div>
+</body>
+</html>
