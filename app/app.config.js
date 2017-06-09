@@ -2,7 +2,7 @@
 
 angular.module('cwdApp')
     .constant('locationName', 'Petrozavodsk')
-    .constant('weatherApiKey', 'your_api_key_here') // PASTE YOUR API KEY HERE!
+    .constant('weatherApiKey', 'ffa5d34a812844e6b99195536170606') // PASTE YOUR API KEY HERE!
 
 
 
