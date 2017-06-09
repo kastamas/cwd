@@ -1,17 +1,17 @@
 # cwd
 **C**harts **W**idgets **D**ashboard
 
-A test sandbox-project.
+### Descriptoon
+*cwd is a sandbox-SPA for skills testing.*
+
+Written on JS with AngularJS 1.5.8.
+
 
 ### How to initialize
 1. Do the git clone
 1. Do the bower update
+1. Get your personal API Key from [this](https://developer.worldweatheronline.com/)
+1. Paste this Key in /app/app.config.js in string:
+` .constant('weatherApiKey', 'your_api_key_here') // PASTE YOUR API KEY HERE!`
 
-That's All :) 
-
-## Примечание
-Рабочий диапазон данных для периода дат = Сегодня + 13 дней.
-Это обусловлено тем, как сторонее API возвращает данные. 
-
-По умолчанию выставлен диапазон в неделю. 
-
+Voila ^_^

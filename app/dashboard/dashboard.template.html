@@ -1,34 +1,47 @@
-<hr>
-
 <!--Dashboard-->
 <div class="row">
-    <div class="col-md-2">
-        <h3  style="cursor: default; margin-top: 28px;" class="text-muted-more" title="location">{{location}}</h3>
-    </div>
-    <!--Data Picker-->
-    <div class="col-md-2">
-        <label>Start date:</label>
-        <input type="date" class="form-control" ng-model="dates.start">
+    <div class="col-md-2 col-md-offset-2">
+        <span class="text-muted-more"> Start date:</span>
     </div>
     <div class="col-md-2">
-        <label>End date:</label>
-        <input type="date" class="form-control" ng-model="dates.end">
+        <span class="text-muted-more"> End date:</span>
     </div>
+</div>
+<div class="row">
+    <div class="col-md-2">
+        <h3  style="cursor: default;  margin-top: 5px;" class="text-muted" title="location">{{location}}</h3>
+    </div>
+
+    <!--New Data Picker-->
+    <div class="col-md-2">
+        <p class="input-group">
+            <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="dates.start" is-open="popup1.opened" datepicker-options="dateOptionsStart" ng-required="true" close-text="Close"/>
+            <span class="input-group-btn">
+            <button type="button" class="btn btn-default" ng-click="open1()"><i class="glyphicon glyphicon-calendar"></i></button>
+            </span>
+        </p>
+    </div>
+    <div class="col-md-2">
+        <p class="input-group">
+            <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="dates.end" is-open="popup2.opened" datepicker-options="dateOptionsEnd" close-text="Close" />
+            <span class="input-group-btn">
+            <button type="button" class="btn btn-default" ng-click="open2()"><i class="glyphicon glyphicon-calendar"></i></button>
+            </span>
+        </p>
+    </div>
+
 
     <!--Controls-->
     <div class="col-md-2">
         <a class="nav-link-button" ng-click="addChart()">Add chart +</a>
     </div>
 </div>
-
 <hr>
 
 <!--Charts-->
-<div class="container">
-    <div class="row ">
-        <div class="col-lg-6" ng-repeat="item in charts">
+<div class="row ">
+        <div ng-repeat="item in charts" class="col-lg-6" >
             <data-chart-dir dashboard-dates="dates" dashboard-data-values="weatherDataValues" chart-id="{{item}}" chart-order="{{$index+1}}" chart-remove="removeChart" cd-sensors="sensors"   cd-sensors-all-data="$ctrl.sensorsNames" ></data-chart-dir>
         </div>
-    </div>
 </div>
 

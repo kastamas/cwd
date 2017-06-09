@@ -11,19 +11,75 @@ function MainCtrl($scope, locationName) {
         this.today = today;
         this.start = today;
         this.end = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 6, today.getHours(), today.getMinutes());
+        this.maxDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 13, today.getHours(), today.getMinutes());
 
         this.getPeriod = function () {
             return Math.round((this.end - this.start) / (oneDay));
         };
-        this.margin = Math.round((this.start - this.today) / (oneDay));
+        this.margin = function () {
+            return Math.round((this.start - this.today) / (oneDay));
+        }
 
     }
 
 
     // init
     $scope.charts = [1]; /// array with chars id's
-    $scope.dates = new Dates();
     $scope.sensors = [[]];//todo:improve
+
+
+    // date picker
+    $scope.dates = new Dates();
+
+
+    $scope.inlineOptions = {
+        minDate: new Date(),
+        showWeeks: true
+    };
+
+    $scope.dateOptionsStart = {
+        dateDisabled: disabledStart,
+        formatYear: 'yy',
+        minDate: $scope.dates.today,
+        maxDate: $scope.dates.maxDate,
+        startingDay: 1
+    };
+    $scope.dateOptionsEnd = {
+        dateDisabled: disabledEnd,
+        formatYear: 'yy',
+        minDate: $scope.dates.today,
+        maxDate: $scope.dates.maxDate,
+        startingDay: 1
+    };
+
+    // Disable some selection
+    function disabledStart(data) {
+        var date = data.date,
+            mode = data.mode;
+        return mode === 'day' && (date.getDate() > ($scope.dates.end.getDate() - 2));
+    }
+
+    function disabledEnd(data) {
+        var date = data.date,
+            mode = data.mode;
+        return mode === 'day' && (date.getDate() < ($scope.dates.start.getDate() + 2));
+    }
+
+    $scope.open1 = function () {
+        $scope.popup1.opened = true;
+    };
+    $scope.open2 = function () {
+        $scope.popup2.opened = true;
+    };
+    $scope.format = 'dd.MM.yyyy';
+
+    $scope.popup1 = {
+        opened: false
+    };
+    $scope.popup2 = {
+        opened: false
+    };
+
 
     $scope.location = locationName;
 
@@ -100,34 +156,11 @@ function chartDir() {
         controller: function ($scope) {
 
             function watchDates(newValue, oldValue) {
-                //обработка исключительных ситуации greate if's wall todo: improve it
-                if (newValue.start === null || newValue.end === null) {
-                    throw new Error('Нужно выбрать даты, чтобы начать построение графиков!');
-                }//todo: improve errors displaying
-
-                if (oldValue.start === null || oldValue.end === null) {
-                    $scope.labels = createLabels(newValue);
-                    return;
-                }
-
-                if (newValue.start < newValue.today){
-                    throw new Error('Нельзя выбрать дату из прошлого!');
-                }
-
-                if (newValue.getPeriod($scope.dashboardDates.today, $scope.dashboardDates.end) > 13){
-                    throw new Error('Нет данных, дальше чем за 2 недели!')
-                }
-
-
 
                 var oldPeriod = oldValue.getPeriod();
                 var newPeriod = newValue.getPeriod();
                 var difference = newPeriod - oldPeriod;
                 var i;
-
-                if (newPeriod < 1)
-                    throw new Error('Для рассчётов, нужно чтобы был выбран период хотя бы из 2-х дней!');
-
 
 
                 if (difference > 0) {// если разница больше, период увеличился
@@ -135,6 +168,7 @@ function chartDir() {
                         //старт сдвинулся  влево
                         for (i = 1; i <= difference; i++)
                             $scope.labels.unshift(createLabel(oldValue, -i));
+                        watchSensors();
                     } else {
                         //конец cдвинулся  вправо
                         for (i = 1; i <= difference; i++)
@@ -143,11 +177,11 @@ function chartDir() {
                 } else {
                     if (oldValue.start < newValue.start) {
                         //старт сдвинулся  вправо
-                        for (; difference < 0; difference++){
+                        for (; difference < 0; difference++) {
                             $scope.labels.shift();
 
                         }
-
+                        watchSensors();
                     } else {
                         //конец cдвинулся  влево
                         for (; difference < 0; difference++)
@@ -158,41 +192,40 @@ function chartDir() {
             }
 
             function watchSensors() {
-                var sensorsNames = [];
-                var dataset = [];
-                var data = [];
-                var options = {fill: false};
-                var sensors = $scope.cdSensors[$scope.chartOrder - 1];
+                    let sensorsNames = [],
+                        dataset = [],
+                        data = [];
+                    let options = {fill: false};
+                    let sensors = $scope.cdSensors[$scope.chartOrder - 1];
+                    let margin = $scope.dashboardDates.margin();
+
+                    if (sensors.length < 1) { // crutch for showing empty chart todo:remove
+                        $scope.data = [0];
+                        $scope.options.legend.display = false;
+                        return;
+                    }
 
 
-
-                if(sensors.length < 1){ // crutch
-                    $scope.data = [0];
-                    $scope.options.legend.display = false;
-                    return;
-                }
-
-
-                sensors.forEach(function (item, i) {
-                    sensorsNames.push(item.name);
-                    dataset.push(options);
-                    $scope.dashboardDataValues.forEach(function (sensor, j) {
-                        if(sensor.name == item.name){
-                            data.push(sensor.values);
-                        }
+                    sensors.forEach(function (item, i) {
+                        sensorsNames.push(item.name);
+                        dataset.push(options);
+                        $scope.dashboardDataValues.forEach(function (sensor, j) {
+                            if (sensor.name == item.name) {
+                                data.push(sensor.values.slice(margin));
+                            }
+                        });
                     });
-                });
 
-                $scope.series = sensorsNames; //array of sensor's names
+                    $scope.series = sensorsNames; //array of sensor's names
 
-                dataset.length == 0
-                    ? $scope.dataset = undefined
-                    : $scope.dataset = dataset; //todo: it isn't works
+                    dataset.length == 0
+                        ? $scope.dataset = undefined
+                        : $scope.dataset = dataset; //todo: it isn't works
 
-                /*($scope.dashboardDates.start, $scope.dashboardDates.end)*/
-                $scope.data = data;
-                $scope.options.legend.display = true;
-                $scope.status = $scope.cdSensors[$scope.chartOrder - 1].length;
+                    /*($scope.dashboardDates.start, $scope.dashboardDates.end)*/
+                    $scope.data = data;
+                    $scope.options.legend.display = true;
+                    $scope.status = $scope.cdSensors[$scope.chartOrder - 1].length;
             }
 
 
@@ -213,6 +246,7 @@ function chartDir() {
 
             // init
             $scope.labels = createLabels($scope.dashboardDates);
+            $scope.dataValues = $scope.dashboardDataValues;
 
             // chart init
             $scope.type = 'line';
@@ -254,7 +288,6 @@ function chartDir() {
             $scope.changeColour = function (index) {
                 $scope.colors.splice(index, 1, '#000000');
             };
-
 
 
             // Watchers
@@ -339,7 +372,7 @@ angular.module('dashboard')
         });
     }])
 
-    .controller("MainCtrl", ['$scope','locationName', MainCtrl])
+    .controller("MainCtrl", ['$scope', 'locationName', MainCtrl])
 
     .directive('chartDir', chartDir)
     .directive('sensorsDir', sensorsDir)

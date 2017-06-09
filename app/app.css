@@ -10,6 +10,10 @@ label {
     border-top: 1px solid #eee;
 }
 
+.navbar-default {
+    background: #fafbfc;
+    border-bottom: 1px solid #eee ;
+}
 /*Custom styles*/
 .btn-gh {
     background-color: #444;
@@ -41,7 +45,7 @@ label {
 }
 
 .nav-link-button {
-    top: 30px;
+    top: 10px;
     position: relative;
     cursor: pointer;
 }
