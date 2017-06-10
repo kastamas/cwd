@@ -14,6 +14,10 @@ label {
     background: #fafbfc;
     border-bottom: 1px solid #eee ;
 }
+
+.masthead h3{
+    margin-top:16px;
+}
 /*Custom styles*/
 .btn-gh {
     background-color: #444;
