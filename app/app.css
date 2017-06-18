@@ -12,7 +12,8 @@ label {
 
 .navbar-default {
     background: #fafbfc;
-    border-bottom: 1px solid #eee ;
+    border-bottom: 1px solid #e1e4e8;
+    border-radius: 0;
 }
 
 .masthead h3{
